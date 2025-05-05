@@ -1,6 +1,3 @@
-from flask import Flask, make_response
-app = Flask(__name__)
-
 data = [
     {
         "id": "3b58aade-8415-49dd-88db-8d7bce14932a",
