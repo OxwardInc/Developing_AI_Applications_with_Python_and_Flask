@@ -81,6 +81,7 @@ def find_by_uuid(id):
             return person
     # If no matching person is found, return a JSON response with a message and a 404 Not Found status code
     return {"message": "person not found"}, 404
+
 @app.route("/person/<uuid:id>", methods=['DELETE'])
 def delete_by_uuid(id):
     # Iterate through the 'data' list to search for a person with a matching ID
@@ -93,3 +94,35 @@ def delete_by_uuid(id):
             return {"message": f"Person with ID {id} deleted"}, 200
     # If no matching person is found, return a JSON response with a message and a 404 Not Found status code
     return {"message": "person not found"}, 404
+
+@app.route("/person", methods=['POST'])
+def add_by_uuid():
+    # Get JSON from the incoming request
+    new_person = request.get_json()
+
+    # Check if the JSON data is empty or None
+    if not new_person:
+        # Return a JSON response indicating that the request data is invalid or missing
+        # with a status code of 400 (Bad Request)
+        respone = make_response(jsonify({"message": 'Invalid input, no data provided'}))
+        respone.status_code = 400
+        return respone
+    # Proceed with further processing of 'new_person', such as adding it to a database
+    # or validating its contents before saving it
+    for person in data:
+        if person['id'] == new_person['id']:
+            return make_response(jsonify({"message": 'Person with this ID already exixts'}), 409)
+    # Assuming the processing is successful, return a success message with status code 201 (Created)
+    try:
+        data.append(new_person)
+    except NameError:
+        return {"message": 'data not defined'}, 500
+    respone = make_response(jsonify({'message': f"Person {new_person['id']} created succesfully"}))
+    respone.status_code = 201
+    return respone
+
+@app.errorhandler(404)
+def api_not_found(error):
+    # This function is a custom error handler for 404 Not Found errors
+    # It is triggered whenever a 404 error occurs within the Flask application
+    return {"message": "API not found"}, 404
